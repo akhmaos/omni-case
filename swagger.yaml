@@ -1,0 +1,107 @@
+swagger: "2.0"
+info:
+  description: Onmi Batch 
+  title: Onmi
+  version: 0.0.1
+consumes:
+  - application/json
+produces:
+  - application/json
+schemes:
+  - http
+  - https
+host: 0.0.0.0:8080
+basePath: /
+
+
+paths:
+  /healthCheck:
+    get:
+      description: Check server availability
+      summary: health-check
+      operationId: health-check
+      tags:
+        - Standard
+      security:
+        - { }
+      responses:
+        200:
+          description: ok
+          schema:
+            type: object
+            properties:
+              ok:
+                type: boolean
+        500:
+          description: pkg server error
+          schema:
+            $ref: "#/definitions/internalServerError"
+
+  /process/items:
+    post:
+        description: Processing items via external service
+        summary: process_items 
+        tags:
+          - Process 
+        parameters:
+          - name: body
+            in: body
+            required: true
+            schema:
+              type: object
+              required:
+                - items
+              properties:
+                items:
+                  description: items for processing
+                  type:  array
+                  items: 
+                    $ref: "#/definitions/item"
+        responses:
+          200:
+            description: ok
+            schema:
+              type: object
+              properties:
+                ok:
+                  type: boolean 
+          500:
+            description: internal server error
+            schema:
+              $ref: "#/definitions/internalServerError"
+          default:
+            description: error
+            schema:
+              $ref: "#/definitions/error"
+    
+definitions:       
+  error:
+    type: object
+    required:
+      - code
+      - message
+    properties:
+      code:
+        description: either same as HTTP Status Code OR >= 600.
+        type: integer
+        format: int32
+      message:
+        type: string
+
+  internalServerError:
+    type: string
+         
+  item:
+    type: object
+    required:
+      - title
+      - key
+    properties:
+      title:
+        description: title of item
+        example: Some title
+        type: string
+      key:
+        description: key of item
+        example: some_key
+        type: string
